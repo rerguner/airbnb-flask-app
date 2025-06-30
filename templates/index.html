@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Airbnb Price & ROI Predictor</title>
+</head>
+<body>
+    <h2>Airbnb Nightly Price and ROI Estimator</h2>
+    <form id="predictForm">
+        <label for="neighbourhood">Neighbourhood:</label>
+        <select id="neighbourhood" name="neighbourhood" required>
+            <option value="camden">Camden</option>
+            <option value="southwark">Southwark</option>
+            <option value="westminster">Westminster</option>
+            <option value="islington">Islington</option>
+            <option value="barnet">Barnet</option>
+            <option value="bexley">Bexley</option>
+            <option value="brent">Brent</option>
+            <option value="bromley">Bromley</option>
+            <option value="croydon">Croydon</option>
+            <option value="ealing">Ealing</option>
+            <option value="enfield">Enfield</option>
+            <option value="greenwich">Greenwich</option>
+            <option value="hackney">Hackney</option>
+            <option value="hammersmith and fulham">Hammersmith and Fulham</option>
+            <option value="haringey">Haringey</option>
+            <option value="harrow">Harrow</option>
+            <option value="havering">Havering</option>
+            <option value="hillingdon">Hillingdon</option>
+            <option value="hounslow">Hounslow</option>
+            <option value="kingston upon thames">Kingston upon Thames</option>
+            <option value="lambeth">Lambeth</option>
+            <option value="lewisham">Lewisham</option>
+            <option value="merton">Merton</option>
+            <option value="newham">Newham</option>
+            <option value="redbridge">Redbridge</option>
+            <option value="richmond upon thames">Richmond upon Thames</option>
+            <option value="sutton">Sutton</option>
+            <option value="tower hamlets">Tower Hamlets</option>
+            <option value="waltham forest">Waltham Forest</option>
+            <option value="wandsworth">Wandsworth</option>
+            <option value="city of london">City of London</option>
+            <option value="barking and dagenham">Barking and Dagenham</option>
+            <option value="kensington and chelsea">Kensington and Chelsea</option>
+        </select><br><br>
+
+        <label for="price_tier">Price Tier:</label>
+        <select id="price_tier" name="price_tier" required>
+            <option value="Low">Low (&lt; £565,889)</option>
+            <option value="Medium">Medium (&lt; £617,720)</option>
+            <option value="High">High (&lt; £842,340)</option>
+            <option value="Very High">Very High (≥ £842,340)</option>
+        </select><br><br>
+
+        <label for="weighted_amenities_bin">Amenities Quality:</label>
+        <select id="weighted_amenities_bin" name="weighted_amenities_bin" required>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+        </select><br><br>
+
+        <label for="beds">Number of Beds:</label>
+        <input type="number" id="beds" name="beds" step="1" min="1" required><br><br>
+
+        <label for="property_price">Property Purchase Price (£):</label>
+        <input type="number" id="property_price" name="property_price" required><br><br>
+
+        <label for="occupancy_rate">Target Occupancy Rate (0-1):</label>
+        <input type="number" id="occupancy_rate" name="occupancy_rate" value="0.7" step="0.01" min="0" max="1"><br><br>
+
+        <button type="submit">Predict</button>
+    </form>
+
+    <h3>Prediction Result:</h3>
+    <pre id="result"></pre>
+
+    <script>
+        document.getElementById("predictForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+
+            const formData = {
+                neighbourhood: document.getElementById("neighbourhood").value,
+                price_tier: document.getElementById("price_tier").value,
+                weighted_amenities_bin: document.getElementById("weighted_amenities_bin").value,
+                beds: document.getElementById("beds").value,
+                property_price: document.getElementById("property_price").value,
+                occupancy_rate: document.getElementById("occupancy_rate").value
+            };
+
+            fetch("/predict", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(formData)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("result").textContent = `❌ Error: ${data.error}`;
+                } else {
+                    document.getElementById("result").textContent =
+                        `Predicted Nightly Price: £${data.predicted_price}\n` +
+                        `Estimated Price Range: £${data.price_range[0]} - £${data.price_range[1]}\n` +
+                        `Annual Income: £${data.annual_income}\n` +
+                        `ROI Payback Period: ${data.roi_months} months`;
+                }
+            })
+            .catch(err => {
+                document.getElementById("result").textContent = `❌ Request failed: ${err}`;
+            });
+        });
+    </script>
+</body>
+</html>
