@@ -97,10 +97,10 @@
                     document.getElementById("result").textContent = `❌ Error: ${data.error}`;
                 } else {
                     document.getElementById("result").textContent =
-                        `Predicted Nightly Price: £${data.predicted_price}\n` +
-                        `Estimated Price Range: £${data.price_range[0]} - £${data.price_range[1]}\n` +
-                        `Annual Income: £${data.annual_income}\n` +
-                        `ROI Payback Period: ${data.roi_months} months`;
+                        `Predicted Nightly Price: £${Math.round(data.predicted_price)}\n` +
+                        `Estimated Price Range: £${Math.round(data.price_range[0])} - £${Math.round(data.price_range[1])}\n` +
+                        `Annual Income: £${Math.round(data.annual_income)}\n` +
+                        `ROI Payback Period: ${Math.round(data.roi_months)} months`;
                 }
             })
             .catch(err => {
